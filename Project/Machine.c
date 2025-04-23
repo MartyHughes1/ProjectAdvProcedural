@@ -3,9 +3,8 @@
 #include<stdlib.h>
 #include<string.h>
 
-typedef struct
-{
-	char chassisNumber[30];
+typedef struct machine {
+	long chassisNum;
 	char make[30];
 	char model[30];
 	int yearOfManufacture;
@@ -18,20 +17,24 @@ typedef struct
 	char ownerPhone[20];
 	char machineType[15];
 	char breakdownFrequency[30];
+	struct machine* next;
 } machineT;
 
 
 //Display the contents of the machine list
-void displayAll(machineT* dB, int size);
+void displayAll(machineT* dB);
 
 //Search for an individual machine in the machine list
 void searchMachine(machineT* dB, int size);
 
+//display machine details for specific machine based on chassis number
+void displayMachineDetails(machineT* dB);
+
 //Add a single book to the machine list
-void addMachine(machineT* dB, int size);
+void addMachine(machineT* dB);
 
 //Edit an individual machine in the list
-void editMachine(machineT* dB, int size);
+void editMachine(machineT* dB);
 
 //Save the contents of the machine list to the backup file
 void saveMachine(machineT* dB, int size);
@@ -64,7 +67,7 @@ void main()
 {
 	int user;
 	int numMachines;
-	machineT* myMachine;
+	machineT* myMachine = NULL;
 	FILE* fp;
 	int option, option2;
 
@@ -140,50 +143,50 @@ void main()
 			switch (option)
 			{
 			case 1:
-				addMachine();
+				addMachine(&myMachine);
 				break;
 			case 2:
-				displayMachines();
+				displayAll(myMachine);
 				break;
 			case 3:
-				displayMachineDetails();
+				displayMachineDetails(myMachine);
 				break;
 			case 4:
-				updateMachine();
+				editMachine(&myMachine);
 				break;
 			case 5:
-				deleteMachine();
+				//deleteMachine();
 				break;
 			case 6:
 				printf("Enter sub-option (A-D): ");
-				scanf(" %c", &subOption);  
+				scanf(" %c", &subOption); 
 				switch (subOption)
 				{
 				case 'A':
 				case 'a':
-					generateStatA();
+					//generateStatA();
 					break;
 				case 'B':
 				case 'b':
-					generateStatB();
+					//generateStatB();
 					break;
 				case 'C':
 				case 'c':
-					generateStatC();
+					//generateStatC();
 					break;
 				case 'D':
 				case 'd':
-					generateStatD();
+				//	generateStatD();
 					break;
 				default:
 					printf("Invalid sub-option.\n");
 				}
 				break;
 			case 7:
-				printToReportFile();
+				//printToReportFile();
 				break;
 			case 8:
-				listByValuation();
+				//listByValuation();
 				break;
 			default:
 				printf("Invalid option. Please try again.\n");
@@ -211,259 +214,136 @@ void main()
 }
 
 
-
-
-
-
-
-			/*
-			//Compare the password
-			if (strcmp(sysPassword, password) == 0)
-			{
-				mode = 1;
-
-				do
-				{
-					printf("Please enter the 1 to create a new database or 2 to load the previous library\n");
-					scanf("%d", &option2);
-				} while (option != 1 && option != 2);
-
-				if (option == 1)
-				{
-					printf("Please enter the number of books in the library\n");
-					scanf("%d", &numBooks);
-
-					myLib = (bookT*)malloc(numBooks * sizeof(bookT));
-
-					for (i = 0; i < numBooks; i++)
-					{
-						(myLib + i)->bookNum = 0;
-						(myLib + i)->price = 0;
-						strcpy((myLib + i)->author, "Empty");
-						strcpy((myLib + i)->title, "Empty");
-					}
-				}
-				else
-				{
-					loadBook(&myLib, &numBooks);
-				}
-			}
-			else
-			{
-
-				loadBook(&myLib, &numBooks);
-			}
-
-		}
-	}
-
-	else
-	{
-		//The guest only gets to load a previous backup library
-		loadBook(&myLib, &numBooks);
-	}
-
-
-
-
-	//Menu for interacting with the library array.....
-	printf("Please enter 1 to Search for a book\n");
-	printf("Please enter 2 to Add One book\n");
-	printf("Please enter 3 to Save the Library to file\n");
-	if (mode == 1)
-	{
-		printf("Please enter 4 to Edit a book\n");
-	}
-	printf("Please enter -1 to Exit\n");
-	scanf("%d", &option);
-
-	while (option != -1)
-	{
-		if (option == 1)
-		{
-			searchBook(myLib, numBooks);
-		}
-
-		else if (option == 2)
-		{
-			addBook(myLib, numBooks);
-		}
-
-		else if (option == 3)
-		{
-			saveBook(myLib, numBooks);
-		}
-		else if (option == 4 && mode == 1)
-		{
-			editBook(myLib, numBooks);
-		}
-		else if (option == 4 && mode == 0)
-		{
-			printf("The guest can not complete the edit option\n");
-		}
-
-
-
-
-		printf("Please enter 1 to Search for a book\n");
-		printf("Please enter 2 to Add One book\n");
-		printf("Please enter 3 to Save the Library to file\n");
-		if (mode == 1)
-		{
-			printf("Please enter 4 to Edit a book\n");
-		}
-		scanf("%d", &option);
-	}
-
-	saveBook(myLib, numBooks);
-	free(myLib);
-}
-
-
-void displayAll(bookT* dB, int size)
+void addMachine(machineT** head)
 {
-	int i;
-
-
-	printf("dB is %d and size is %d\n", dB, size);
-	for (i = 0; i < size; i++)
-	{
-		printf("%ld %s %s %lf\n", (dB + i)->bookNum, (dB + i)->title, (dB + i)->author, (dB + i)->price);
-	}
-}
-
-void searchBook(bookT* dB, int size)
-{
-	int i;
-	long searchNum;
-	int found = 0;
-
-	printf("Please enter the book number you are looking for\n");
-	scanf("%ld", &searchNum);
-
-	for (i = 0; i < size; i++)
-	{
-		if ((dB + i)->bookNum == searchNum)
-		{
-			printf("Book Number %ld\n", (dB + i)->bookNum);
-			printf("Title %s\n", (dB + i)->title);
-			printf("Author %s\n", (dB + i)->author);
-			printf("The price is %lf\n", (dB + i)->price);
-			i = size;
-			found = 1;
-
-		}
-
+	machineT* newMachine = (machineT*)malloc(sizeof(machineT));
+	if (!newMachine) {
+		printf("Memory allocation failed.\n");
+		return;
 	}
 
+	printf("Enter chassis number: ");
+	scanf("%ld", &newMachine->chassisNum);
 
-	if (found == 0)
-		printf("The book can not be found\n");
-
-
-}
-
-
-void addBook(bookT* dB, int size)
-{
-	int i;
-
-	for (i = 0; i < size; i++)
-	{
-		if ((dB + i)->bookNum == 0)
-		{
-			printf("Please enter the book number, title, author and price\n");
-
-			scanf("%ld %s %s %lf", &(dB + i)->bookNum, (dB + i)->title, (dB + i)->author, &(dB + i)->price);
+	// Check if chassis number is unique
+	machineT* current = *head;
+	while (current != NULL) {
+		if (current->chassisNum == newMachine->chassisNum) {
+			printf("Chassis number already exists. Cannot add duplicate.\n");
+			free(newMachine);
 			return;
 		}
+		current = current->next;
 	}
 
-	printf("Can not add another book as the array is full\n");
+	printf("Enter make: ");
+	scanf("%s", newMachine->make);
 
+	printf("Enter model: ");
+	scanf("%s", newMachine->model);
+
+	printf("Enter year of manufacture: ");
+	scanf("%d", &newMachine->yearOfManufacture);
+
+	printf("Enter cost: ");
+	scanf("%lf", &newMachine->cost);
+
+	printf("Enter current valuation: ");
+	scanf("%lf", &newMachine->currentValuation);
+
+	printf("Enter current mileage: ");
+	scanf("%lf", &newMachine->currentMileage);
+
+	printf("Enter next service mileage: ");
+	scanf("%lf", &newMachine->nextServiceMileage);
+
+	printf("Enter owner name: ");
+	scanf(" %[^\n]", newMachine->ownerName);  
+
+	printf("Enter owner email: ");
+	scanf("%s", newMachine->ownerEmail);
+
+	printf("Enter owner phone: ");
+	scanf("%s", newMachine->ownerPhone);
+
+	printf("Enter machine type: ");
+	scanf("%s", newMachine->machineType);
+
+	printf("Enter breakdown frequency: ");
+	scanf(" %[^\n]", newMachine->breakdownFrequency); 
+
+	newMachine->next = NULL;
+
+	// Insert in sorted order by chassis number
+	if (*head == NULL || newMachine->chassisNum < (*head)->chassisNum) {
+		newMachine->next = *head;
+		*head = newMachine;
+	}
+	else {
+		machineT* prev = *head;
+		while (prev->next != NULL && prev->next->chassisNum < newMachine->chassisNum) {
+			prev = prev->next;
+		}
+		newMachine->next = prev->next;
+		prev->next = newMachine;
+	}
+
+	printf("Machine added successfully.\n");
 }
 
-
-void editBook(bookT* dB, int size)
+//Below is to show just the machine chassis number, for full specific machine details, use option 3
+void displayAll(machineT* head)
 {
-	int i;
-	long searchNum;
-	int found = 0;
-
-	printf("Please enter the book number you are looking to edit\n");
-	scanf("%ld", &searchNum);
-
-	for (i = 0; i < size; i++)
-	{
-		if ((dB + i)->bookNum == searchNum)
-		{
-			printf("Enter the new price\n");
-			scanf("%lf", &(dB + i)->price);
-
-			i = size;
-			found = 1;
-
-		}
-
+	if (head == NULL) {
+		printf("No machines to display.\n");
+		return;
 	}
 
-	if (found == 0)
-		printf("The book can not be found\n");
+	machineT* current = head;
+	int count = 1;
 
+	printf("\n--- Machine List ---\n");
+	while (current != NULL) {
+		printf("\nMachine #%d\n", count++);
+		printf("Chassis Number       : %ld\n", current->chassisNum);
+		current = current->next;
+	}
 }
 
-void saveBook(bookT* dB, int size)
-{
-	FILE* fp;
-	int i;
-
-	fp = fopen("backUp.txt", "w");
-
-	if (fp == NULL)
-	{
-		printf("The back up file could not be opened\n");
+// Function to display details of a specific machine based on chassis number
+void displayMachineDetails(machineT* head) {
+	if (head == NULL) {
+		printf("No machines available.\n");
+		return;
 	}
 
-	else
-	{
-		fprintf(fp, "%d\n", size);
+	long chassisNum;
+	printf("Enter chassis number to search for: ");
+	scanf("%ld", &chassisNum);
 
-
-		for (i = 0; i < size; i++)
-		{
-			fprintf(fp, "%ld %s %s %lf\n", (dB + i)->bookNum, (dB + i)->title, (dB + i)->author, (dB + i)->price);
+	machineT* current = head;
+	while (current != NULL) {
+		if (current->chassisNum == chassisNum) {
+			// Display details of the machine
+			printf("\n--- Machine Details ---\n");
+			printf("Chassis Number       : %ld\n", current->chassisNum);
+			printf("Make                 : %s\n", current->make);
+			printf("Model                : %s\n", current->model);
+			printf("Year of Manufacture  : %d\n", current->yearOfManufacture);
+			printf("Cost                 : %.2f\n", current->cost);
+			printf("Current Valuation    : %.2f\n", current->currentValuation);
+			printf("Current Mileage      : %.2f\n", current->currentMileage);
+			printf("Next Service Mileage : %.2f\n", current->nextServiceMileage);
+			printf("Owner Name           : %s\n", current->ownerName);
+			printf("Owner Email          : %s\n", current->ownerEmail);
+			printf("Owner Phone          : %s\n", current->ownerPhone);
+			printf("Machine Type         : %s\n", current->machineType);
+			printf("Breakdown Frequency  : %s\n", current->breakdownFrequency);
+			return;  // Stop once we find and display the machine details
 		}
-
-		fclose(fp);
-
+		current = current->next;
 	}
 
+	// If the machine with the given chassis number is not found
+	printf("Machine with chassis number %ld not found.\n", chassisNum);
 }
-
-
-void loadBook(bookT** dB, int* size)
-{
-	FILE* fp;
-	int i;
-
-	fp = fopen("backUp.txt", "r");
-
-	if (fp == NULL)
-	{
-		printf("The file could not be opened\n");
-
-	}
-
-	else
-	{
-		fscanf(fp, "%d", size);
-
-		*dB = (bookT*)malloc(*size * sizeof(bookT));
-
-		for (i = 0; i < *size; i++)
-		{
-			fscanf(fp, "%ld %s %s %lf", &(*dB + i)->bookNum, (*dB + i)->title, (*dB + i)->author, &(*dB + i)->price);
-		}
-
-
-	}*/
