@@ -62,6 +62,7 @@ void getPassword(char* password) {
 }
 void main()
 {
+	int user;
 	int numMachines;
 	machineT* myMachine;
 	FILE* fp;
@@ -105,14 +106,364 @@ void main()
 
 	if (found) {
 		printf("Login successful!\n");
+		user = 1;
 	}
 	else {
 		printf("Invalid username or password.\n");
+		return 0;
 	}
 
-	return 0;
+
+	if (user == 1)//confirming the login is sucessfull and user can continue
+	{
+		int option;
+		char subOption;
+
+		printf("1) Add machine\n");
+		printf("2) Display all machines to screen\n");
+		printf("3) Display machine details\n");
+		printf("4) Update a machine's details\n");
+		printf("5) Delete machine\n");
+		printf("6) Generate statistics (a – d) based on the machinery type:\n");
+		printf("   A. %% of machines with no breakdowns\n");
+		printf("   B. %% of machines with no breakdowns\n");
+		printf("   C. %% of machines with no breakdowns\n");
+		printf("   D. %% of machines with no breakdowns\n");
+		printf("7) Print all machine details into a report file\n");
+		printf("8) List all the machinery in order of current valuation\n");
+		printf("-1) Exit\n");
+
+		scanf("%d", &option);
+
+		while (option != -1)
+		{
+			switch (option)
+			{
+			case 1:
+				addMachine();
+				break;
+			case 2:
+				displayMachines();
+				break;
+			case 3:
+				displayMachineDetails();
+				break;
+			case 4:
+				updateMachine();
+				break;
+			case 5:
+				deleteMachine();
+				break;
+			case 6:
+				printf("Enter sub-option (A-D): ");
+				scanf(" %c", &subOption);  
+				switch (subOption)
+				{
+				case 'A':
+				case 'a':
+					generateStatA();
+					break;
+				case 'B':
+				case 'b':
+					generateStatB();
+					break;
+				case 'C':
+				case 'c':
+					generateStatC();
+					break;
+				case 'D':
+				case 'd':
+					generateStatD();
+					break;
+				default:
+					printf("Invalid sub-option.\n");
+				}
+				break;
+			case 7:
+				printToReportFile();
+				break;
+			case 8:
+				listByValuation();
+				break;
+			default:
+				printf("Invalid option. Please try again.\n");
+			}
+
+			// Show the menu again
+			printf("\n1) Add machine\n");
+			printf("2) Display all machines to screen\n");
+			printf("3) Display machine details\n");
+			printf("4) Update a machine's details\n");
+			printf("5) Delete machine\n");
+			printf("6) Generate statistics (a – d) based on the machinery type:\n");
+			printf("   A. %% of machines with no breakdowns\n");
+			printf("   B. %% of machines with no breakdowns\n");
+			printf("   C. %% of machines with no breakdowns\n");
+			printf("   D. %% of machines with no breakdowns\n");
+			printf("7) Print all machine details into a report file\n");
+			printf("8) List all the machinery in order of current valuation\n");
+			printf("-1) Exit\n");
+
+			scanf("%d", &option);
+		}
+
+	}
+}
 
 
+
+
+
+
+
+			/*
+			//Compare the password
+			if (strcmp(sysPassword, password) == 0)
+			{
+				mode = 1;
+
+				do
+				{
+					printf("Please enter the 1 to create a new database or 2 to load the previous library\n");
+					scanf("%d", &option2);
+				} while (option != 1 && option != 2);
+
+				if (option == 1)
+				{
+					printf("Please enter the number of books in the library\n");
+					scanf("%d", &numBooks);
+
+					myLib = (bookT*)malloc(numBooks * sizeof(bookT));
+
+					for (i = 0; i < numBooks; i++)
+					{
+						(myLib + i)->bookNum = 0;
+						(myLib + i)->price = 0;
+						strcpy((myLib + i)->author, "Empty");
+						strcpy((myLib + i)->title, "Empty");
+					}
+				}
+				else
+				{
+					loadBook(&myLib, &numBooks);
+				}
+			}
+			else
+			{
+
+				loadBook(&myLib, &numBooks);
+			}
+
+		}
+	}
+
+	else
+	{
+		//The guest only gets to load a previous backup library
+		loadBook(&myLib, &numBooks);
+	}
+
+
+
+
+	//Menu for interacting with the library array.....
+	printf("Please enter 1 to Search for a book\n");
+	printf("Please enter 2 to Add One book\n");
+	printf("Please enter 3 to Save the Library to file\n");
+	if (mode == 1)
+	{
+		printf("Please enter 4 to Edit a book\n");
+	}
+	printf("Please enter -1 to Exit\n");
+	scanf("%d", &option);
+
+	while (option != -1)
+	{
+		if (option == 1)
+		{
+			searchBook(myLib, numBooks);
+		}
+
+		else if (option == 2)
+		{
+			addBook(myLib, numBooks);
+		}
+
+		else if (option == 3)
+		{
+			saveBook(myLib, numBooks);
+		}
+		else if (option == 4 && mode == 1)
+		{
+			editBook(myLib, numBooks);
+		}
+		else if (option == 4 && mode == 0)
+		{
+			printf("The guest can not complete the edit option\n");
+		}
+
+
+
+
+		printf("Please enter 1 to Search for a book\n");
+		printf("Please enter 2 to Add One book\n");
+		printf("Please enter 3 to Save the Library to file\n");
+		if (mode == 1)
+		{
+			printf("Please enter 4 to Edit a book\n");
+		}
+		scanf("%d", &option);
+	}
+
+	saveBook(myLib, numBooks);
+	free(myLib);
+}
+
+
+void displayAll(bookT* dB, int size)
+{
+	int i;
+
+
+	printf("dB is %d and size is %d\n", dB, size);
+	for (i = 0; i < size; i++)
+	{
+		printf("%ld %s %s %lf\n", (dB + i)->bookNum, (dB + i)->title, (dB + i)->author, (dB + i)->price);
+	}
+}
+
+void searchBook(bookT* dB, int size)
+{
+	int i;
+	long searchNum;
+	int found = 0;
+
+	printf("Please enter the book number you are looking for\n");
+	scanf("%ld", &searchNum);
+
+	for (i = 0; i < size; i++)
+	{
+		if ((dB + i)->bookNum == searchNum)
+		{
+			printf("Book Number %ld\n", (dB + i)->bookNum);
+			printf("Title %s\n", (dB + i)->title);
+			printf("Author %s\n", (dB + i)->author);
+			printf("The price is %lf\n", (dB + i)->price);
+			i = size;
+			found = 1;
+
+		}
+
+	}
+
+
+	if (found == 0)
+		printf("The book can not be found\n");
 
 
 }
+
+
+void addBook(bookT* dB, int size)
+{
+	int i;
+
+	for (i = 0; i < size; i++)
+	{
+		if ((dB + i)->bookNum == 0)
+		{
+			printf("Please enter the book number, title, author and price\n");
+
+			scanf("%ld %s %s %lf", &(dB + i)->bookNum, (dB + i)->title, (dB + i)->author, &(dB + i)->price);
+			return;
+		}
+	}
+
+	printf("Can not add another book as the array is full\n");
+
+}
+
+
+void editBook(bookT* dB, int size)
+{
+	int i;
+	long searchNum;
+	int found = 0;
+
+	printf("Please enter the book number you are looking to edit\n");
+	scanf("%ld", &searchNum);
+
+	for (i = 0; i < size; i++)
+	{
+		if ((dB + i)->bookNum == searchNum)
+		{
+			printf("Enter the new price\n");
+			scanf("%lf", &(dB + i)->price);
+
+			i = size;
+			found = 1;
+
+		}
+
+	}
+
+	if (found == 0)
+		printf("The book can not be found\n");
+
+}
+
+void saveBook(bookT* dB, int size)
+{
+	FILE* fp;
+	int i;
+
+	fp = fopen("backUp.txt", "w");
+
+	if (fp == NULL)
+	{
+		printf("The back up file could not be opened\n");
+	}
+
+	else
+	{
+		fprintf(fp, "%d\n", size);
+
+
+		for (i = 0; i < size; i++)
+		{
+			fprintf(fp, "%ld %s %s %lf\n", (dB + i)->bookNum, (dB + i)->title, (dB + i)->author, (dB + i)->price);
+		}
+
+		fclose(fp);
+
+	}
+
+}
+
+
+void loadBook(bookT** dB, int* size)
+{
+	FILE* fp;
+	int i;
+
+	fp = fopen("backUp.txt", "r");
+
+	if (fp == NULL)
+	{
+		printf("The file could not be opened\n");
+
+	}
+
+	else
+	{
+		fscanf(fp, "%d", size);
+
+		*dB = (bookT*)malloc(*size * sizeof(bookT));
+
+		for (i = 0; i < *size; i++)
+		{
+			fscanf(fp, "%ld %s %s %lf", &(*dB + i)->bookNum, (*dB + i)->title, (*dB + i)->author, &(*dB + i)->price);
+		}
+
+
+	}*/

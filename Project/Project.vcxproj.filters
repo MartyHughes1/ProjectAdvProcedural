@@ -23,5 +23,8 @@
     <Text Include="credentials.txt">
       <Filter>Resource Files</Filter>
     </Text>
+    <Text Include="fleet.txt">
+      <Filter>Source Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>
