@@ -21,6 +21,21 @@ typedef struct machine {
 } machineT;
 
 
+//Function to ignore casing of machines from user entry
+int compareIgnoreCase(const char* s1, const char* s2) {
+	while (*s1 && *s2) {
+		if (tolower(*s1) != tolower(*s2)) {
+			return 0;  
+		}
+		s1++;
+		s2++;
+	}
+	//They are equal
+	return *s1 == *s2;  
+}
+
+
+
 //Display the contents of the machine list
 void displayAll(machineT* dB);
 
@@ -37,9 +52,14 @@ void editMachine(machineT* dB);
 //delete a machine from list
 void deleteMachine(machineT** head);
 
+//generating statistics of breakdowns
+void generateStat(machineT* head, const char* type);
+
 
 //Save the contents of the machine list to the backup file
 void saveMachine(machineT* dB, int size);
+
+int compareIgnoreCase(const char* s1, const char* s2);
 
 
 // Function to get password input with asterisks
@@ -127,11 +147,7 @@ void main()
 		printf("3) Display machine details\n");
 		printf("4) Update a machine's details\n");
 		printf("5) Delete machine\n");
-		printf("6) Generate statistics (a – d) based on the machinery type:\n");
-		printf("   A. %% of machines with no breakdowns\n");
-		printf("   B. %% of machines with no breakdowns\n");
-		printf("   C. %% of machines with no breakdowns\n");
-		printf("   D. %% of machines with no breakdowns\n");
+		printf("6) Generate statistics (a – e) based on the machinery type:\n");
 		printf("7) Print all machine details into a report file\n");
 		printf("8) List all the machinery in order of current valuation\n");
 		printf("-1) Exit\n");
@@ -158,30 +174,37 @@ void main()
 				deleteMachine(&myMachine);
 				break;
 			case 6:
-				printf("Enter sub-option (A-D): ");
-				scanf(" %c", &subOption); 
-				switch (subOption)
+				printf("\nChoose machinery type:\n");
+				printf("A. Tractor\n");
+				printf("B. Excavator\n");
+				printf("C. Roller\n");
+				printf("D. Crane\n");
+				printf("E. Mixer\n");
+				printf("Enter option (A-E): ");
+				scanf(" %c", &subOption);
+
+				switch (toupper(subOption))
 				{
 				case 'A':
-				case 'a':
-					//generateStatA();
+					generateStat(myMachine, "Tractor");
 					break;
 				case 'B':
-				case 'b':
-					//generateStatB();
+					generateStat(myMachine, "Excavator");
 					break;
 				case 'C':
-				case 'c':
-					//generateStatC();
+					generateStat(myMachine, "Roller");
 					break;
 				case 'D':
-				case 'd':
-				//	generateStatD();
+					generateStat(myMachine, "Crane");
+					break;
+				case 'E':
+					generateStat(myMachine, "Mixer");
 					break;
 				default:
 					printf("Invalid sub-option.\n");
 				}
 				break;
+
 			case 7:
 				//printToReportFile();
 				break;
@@ -198,11 +221,7 @@ void main()
 			printf("3) Display machine details\n");
 			printf("4) Update a machine's details\n");
 			printf("5) Delete machine\n");
-			printf("6) Generate statistics (a – d) based on the machinery type:\n");
-			printf("   A. %% of machines with no breakdowns\n");
-			printf("   B. %% of machines with no breakdowns\n");
-			printf("   C. %% of machines with no breakdowns\n");
-			printf("   D. %% of machines with no breakdowns\n");
+			printf("6) Generate statistics (a – e) based on the machinery type:\n");
 			printf("7) Print all machine details into a report file\n");
 			printf("8) List all the machinery in order of current valuation\n");
 			printf("-1) Exit\n");
@@ -444,5 +463,35 @@ void deleteMachine(machineT** head) {
 	}
 
 	printf("Machine with chassis number %ld not found.\n", chassisNum);
+}
+
+
+
+void generateStat(machineT* head, const char* type) {
+	int total = 0, noBreakdowns = 0;
+	machineT* current = head;
+
+	while (current != NULL) {
+		//comparing the type to the actual machine and calling the function to ignore casing
+		if (compareIgnoreCase(current->machineType, type)) {
+			total++;
+
+
+			// If user enters none for breakdowns or 0, they both will have no breakdowns put down
+			if (compareIgnoreCase(current->breakdownFrequency, "None") || strcmp(current->breakdownFrequency, "0") == 0) {
+				noBreakdowns++;
+			}
+		}
+		current = current->next;
+	}
+
+	if (total == 0) {
+		printf("No machines of type '%s' found.\n", type);
+		return;
+	}
+
+	double percentage = (double)noBreakdowns / total * 100;
+	printf("'%s': %.2f%% have no breakdowns (%d of %d machines)\n",
+		type, percentage, noBreakdowns, total);
 }
 
