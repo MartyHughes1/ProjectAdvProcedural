@@ -347,3 +347,64 @@ void displayMachineDetails(machineT* head) {
 	// If the machine with the given chassis number is not found
 	printf("Machine with chassis number %ld not found.\n", chassisNum);
 }
+
+
+void editMachine(machineT** head) {
+	if (*head == NULL) {
+		printf("No machines available to edit.\n");
+		return;
+	}
+
+	long chassisNum;
+	printf("Enter chassis number of the machine you want to edit: ");
+	scanf("%ld", &chassisNum);
+
+	machineT* current = *head;
+	while (current != NULL) {
+		if (current->chassisNum == chassisNum) {
+			printf("\nEditing machine with chassis number: %ld\n", chassisNum);
+
+			printf("Enter new make (current: %s): ", current->make);
+			scanf("%s", current->make);
+
+			printf("Enter new model (current: %s): ", current->model);
+			scanf("%s", current->model);
+
+			printf("Enter new year of manufacture (current: %d): ", current->yearOfManufacture);
+			scanf("%d", &current->yearOfManufacture);
+
+			printf("Enter new cost (current: %.2f): ", current->cost);
+			scanf("%lf", &current->cost);
+
+			printf("Enter new current valuation (current: %.2f): ", current->currentValuation);
+			scanf("%lf", &current->currentValuation);
+
+			printf("Enter new current mileage (current: %.2f): ", current->currentMileage);
+			scanf("%lf", &current->currentMileage);
+
+			printf("Enter new next service mileage (current: %.2f): ", current->nextServiceMileage);
+			scanf("%lf", &current->nextServiceMileage);
+
+			printf("Enter new owner name (current: %s): ", current->ownerName);
+			scanf(" %[^\n]", current->ownerName);
+
+			printf("Enter new owner email (current: %s): ", current->ownerEmail);
+			scanf("%s", current->ownerEmail);
+
+			printf("Enter new owner phone (current: %s): ", current->ownerPhone);
+			scanf("%s", current->ownerPhone);
+
+			printf("Enter new machine type (current: %s): ", current->machineType);
+			scanf("%s", current->machineType);
+
+			printf("Enter new breakdown frequency (current: %s): ", current->breakdownFrequency);
+			scanf(" %[^\n]", current->breakdownFrequency);
+
+			printf("Machine details updated successfully.\n");
+			return;
+		}
+		current = current->next;
+	}
+
+	printf("Machine with chassis number %ld not found.\n", chassisNum);
+}
