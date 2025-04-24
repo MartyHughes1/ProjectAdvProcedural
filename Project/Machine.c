@@ -24,8 +24,6 @@ typedef struct machine {
 //Display the contents of the machine list
 void displayAll(machineT* dB);
 
-//Search for an individual machine in the machine list
-void searchMachine(machineT* dB, int size);
 
 //display machine details for specific machine based on chassis number
 void displayMachineDetails(machineT* dB);
@@ -36,11 +34,13 @@ void addMachine(machineT* dB);
 //Edit an individual machine in the list
 void editMachine(machineT* dB);
 
+//delete a machine from list
+void deleteMachine(machineT** head);
+
+
 //Save the contents of the machine list to the backup file
 void saveMachine(machineT* dB, int size);
 
-//Initialise the machine list from a file
-void loadMachine(machineT** dB, int* size);
 
 // Function to get password input with asterisks
 void getPassword(char* password) {
@@ -155,7 +155,7 @@ void main()
 				editMachine(&myMachine);
 				break;
 			case 5:
-				//deleteMachine();
+				deleteMachine(&myMachine);
 				break;
 			case 6:
 				printf("Enter sub-option (A-D): ");
@@ -408,3 +408,41 @@ void editMachine(machineT** head) {
 
 	printf("Machine with chassis number %ld not found.\n", chassisNum);
 }
+
+
+
+void deleteMachine(machineT** head) {
+	if (*head == NULL) {
+		printf("No machines available to delete.\n");
+		return;
+	}
+
+	long chassisNum;
+	printf("Enter chassis number of the machine you want to delete: ");
+	scanf("%ld", &chassisNum);
+
+	machineT* current = *head;
+	machineT* prev = NULL;
+
+	while (current != NULL) {
+		if (current->chassisNum == chassisNum) {
+			// If the node to delete is the head
+			if (prev == NULL) {
+				*head = current->next;
+			}
+			else {
+				prev->next = current->next;
+			}
+
+			free(current);
+			printf("Machine with chassis number %ld deleted successfully.\n", chassisNum);
+			return;
+		}
+
+		prev = current;
+		current = current->next;
+	}
+
+	printf("Machine with chassis number %ld not found.\n", chassisNum);
+}
+
