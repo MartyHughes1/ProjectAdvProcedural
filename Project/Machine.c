@@ -58,6 +58,9 @@ void generateStat(machineT* head, const char* type);
 //save contents of machines to file
 void printToReportFile(machineT* head);
 
+//listing the machines in order of valuation
+void listByValuation(machineT* head);
+
 
 int compareIgnoreCase(const char* s1, const char* s2);
 
@@ -147,7 +150,7 @@ void main()
 		printf("3) Display machine details\n");
 		printf("4) Update a machine's details\n");
 		printf("5) Delete machine\n");
-		printf("6) Generate statistics (a – e) based on the machinery type:\n");
+		printf("6) Generate statistics (a - e) based on the machinery type:\n");
 		printf("7) Print all machine details into a report file\n");
 		printf("8) List all the machinery in order of current valuation\n");
 		printf("-1) Exit\n");
@@ -210,8 +213,9 @@ void main()
 				break;
 
 			case 8:
-				//listByValuation();
+				listByValuation(myMachine);
 				break;
+
 			default:
 				printf("Invalid option. Please try again.\n");
 			}
@@ -222,7 +226,7 @@ void main()
 			printf("3) Display machine details\n");
 			printf("4) Update a machine's details\n");
 			printf("5) Delete machine\n");
-			printf("6) Generate statistics (a – e) based on the machinery type:\n");
+			printf("6) Generate statistics (a - e) based on the machinery type:\n");
 			printf("7) Print all machine details into a report file\n");
 			printf("8) List all the machinery in order of current valuation\n");
 			printf("-1) Exit\n");
@@ -565,3 +569,53 @@ void printToReportFile(machineT* head) {
 	printf("Machine details and performance statistics written to 'fleet.txt'.\n");
 }
 
+
+
+
+void listByValuation(machineT* head) {
+	if (head == NULL) {
+		printf("No machines to list.\n");
+		return;
+	}
+
+	// Count number of machines
+	int count = 0;
+	machineT* current = head;
+	while (current != NULL) {
+		count++;
+		current = current->next;
+	}
+
+	// Copy to array for sorting
+	machineT** machineArray = (machineT**)malloc(count * sizeof(machineT*));
+	if (machineArray == NULL) {
+		printf("Memory allocation failed.\n");
+		return;
+	}
+
+	current = head;
+	for (int i = 0; i < count; i++) {
+		machineArray[i] = current;
+		current = current->next;
+	}
+
+	// Sort array in descending order by currentValuation
+	for (int i = 0; i < count - 1; i++) {
+		for (int j = i + 1; j < count; j++) {
+			if (machineArray[i]->currentValuation < machineArray[j]->currentValuation) {
+				machineT* temp = machineArray[i];
+				machineArray[i] = machineArray[j];
+				machineArray[j] = temp;
+			}
+		}
+	}
+
+	// Print sorted list
+	printf("\n==== Machines Sorted by Current Valuation ====\n");
+	for (int i = 0; i < count; i++) {
+		printf("Chassis Number: %ld\tValuation: %.2f\n",
+			machineArray[i]->chassisNum, machineArray[i]->currentValuation);
+	}
+
+	free(machineArray);
+}
