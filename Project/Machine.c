@@ -284,8 +284,22 @@ void addMachine(machineT * *head)
 	printf("Enter owner name: ");
 	scanf(" %[^\n]", newMachine->ownerName);
 
-	printf("Enter owner email: ");
-	scanf("%s", newMachine->ownerEmail);
+	//email validation checker to check for @ symbol and .com
+	do {
+		printf("Enter owner email (must contain '@' and end with '.com'): ");
+		scanf("%s", newMachine->ownerEmail);
+
+		if (strchr(newMachine->ownerEmail, '@') == NULL ||
+			strstr(newMachine->ownerEmail, ".com") == NULL ||
+			//below checks the email ends with .com 
+			strcmp(newMachine->ownerEmail + strlen(newMachine->ownerEmail) - 4, ".com") != 0) {
+			printf("Invalid email format. Please try again.\n");
+		}
+		else {
+			break;  
+		}
+
+	} while (1);
 
 	printf("Enter owner phone: ");
 	scanf("%s", newMachine->ownerPhone);
