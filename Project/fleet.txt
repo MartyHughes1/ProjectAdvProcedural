@@ -1,0 +1,23 @@
+==== Fleet Machine Report ====
+
+Machine #1
+Chassis Number       : 2132
+Make                 : 321132
+Model                : 32231
+Year of Manufacture  : 23123
+Cost                 : 213321.00
+Current Valuation    : 312231.00
+Current Mileage      : 21332.00
+Next Service Mileage : 321123.00
+Owner Name           : 23123
+Owner Email          : 321123
+Owner Phone          : 321213
+Machine Type         : tractor
+Breakdown Frequency  : 0
+
+==== Machine Performance Statistics ====
+Tractor: 100.00% have no breakdowns (1 of 1 machines)
+Excavator: No machines of this type found.
+Roller: No machines of this type found.
+Crane: No machines of this type found.
+Mixer: No machines of this type found.

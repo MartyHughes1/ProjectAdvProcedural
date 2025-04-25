@@ -4,34 +4,34 @@
 #include<string.h>
 
 typedef struct machine {
-	long chassisNum;
-	char make[30];
-	char model[30];
-	int yearOfManufacture;
-	double cost;
-	double currentValuation;
-	double currentMileage;
-	double nextServiceMileage;
-	char ownerName[50];
-	char ownerEmail[50];
-	char ownerPhone[20];
-	char machineType[15];
-	char breakdownFrequency[30];
-	struct machine* next;
+long chassisNum;
+char make[30];
+char model[30];
+int yearOfManufacture;
+double cost;
+double currentValuation;
+double currentMileage;
+double nextServiceMileage;
+char ownerName[50];
+char ownerEmail[50];
+char ownerPhone[20];
+char machineType[15];
+char breakdownFrequency[30];
+struct machine* next;
 } machineT;
 
 
 //Function to ignore casing of machines from user entry
 int compareIgnoreCase(const char* s1, const char* s2) {
-	while (*s1 && *s2) {
-		if (tolower(*s1) != tolower(*s2)) {
-			return 0;  
-		}
-		s1++;
-		s2++;
+while (*s1 && *s2) {
+	if (tolower(*s1) != tolower(*s2)) {
+		return 0;
 	}
-	//They are equal
-	return *s1 == *s2;  
+	s1++;
+	s2++;
+}
+//They are equal
+return *s1 == *s2;
 }
 
 
@@ -55,9 +55,9 @@ void deleteMachine(machineT** head);
 //generating statistics of breakdowns
 void generateStat(machineT* head, const char* type);
 
+//save contents of machines to file
+void printToReportFile(machineT* head);
 
-//Save the contents of the machine list to the backup file
-void saveMachine(machineT* dB, int size);
 
 int compareIgnoreCase(const char* s1, const char* s2);
 
@@ -67,11 +67,11 @@ void getPassword(char* password) {
 	int i = 0;
 	char ch;
 
-	while ((ch = getch()) != '\r') {  
-		if (ch == '\b') {  
+	while ((ch = getch()) != '\r') {
+		if (ch == '\b') {
 			if (i > 0) {
 				i--;
-				printf("\b \b");  
+				printf("\b \b");
 			}
 		}
 		else if (i < 30 - 1) {
@@ -206,8 +206,9 @@ void main()
 				break;
 
 			case 7:
-				//printToReportFile();
+				printToReportFile(myMachine);
 				break;
+
 			case 8:
 				//listByValuation();
 				break;
@@ -233,7 +234,7 @@ void main()
 }
 
 
-void addMachine(machineT** head)
+void addMachine(machineT * *head)
 {
 	machineT* newMachine = (machineT*)malloc(sizeof(machineT));
 	if (!newMachine) {
@@ -277,7 +278,7 @@ void addMachine(machineT** head)
 	scanf("%lf", &newMachine->nextServiceMileage);
 
 	printf("Enter owner name: ");
-	scanf(" %[^\n]", newMachine->ownerName);  
+	scanf(" %[^\n]", newMachine->ownerName);
 
 	printf("Enter owner email: ");
 	scanf("%s", newMachine->ownerEmail);
@@ -289,7 +290,7 @@ void addMachine(machineT** head)
 	scanf("%s", newMachine->machineType);
 
 	printf("Enter breakdown frequency: ");
-	scanf(" %[^\n]", newMachine->breakdownFrequency); 
+	scanf(" %[^\n]", newMachine->breakdownFrequency);
 
 	newMachine->next = NULL;
 
@@ -311,7 +312,7 @@ void addMachine(machineT** head)
 }
 
 //Below is to show just the machine chassis number, for full specific machine details, use option 3
-void displayAll(machineT* head)
+void displayAll(machineT * head)
 {
 	if (head == NULL) {
 		printf("No machines to display.\n");
@@ -330,7 +331,7 @@ void displayAll(machineT* head)
 }
 
 // Function to display details of a specific machine based on chassis number
-void displayMachineDetails(machineT* head) {
+void displayMachineDetails(machineT * head) {
 	if (head == NULL) {
 		printf("No machines available.\n");
 		return;
@@ -368,7 +369,7 @@ void displayMachineDetails(machineT* head) {
 }
 
 
-void editMachine(machineT** head) {
+void editMachine(machineT * *head) {
 	if (*head == NULL) {
 		printf("No machines available to edit.\n");
 		return;
@@ -430,7 +431,7 @@ void editMachine(machineT** head) {
 
 
 
-void deleteMachine(machineT** head) {
+void deleteMachine(machineT * *head) {
 	if (*head == NULL) {
 		printf("No machines available to delete.\n");
 		return;
@@ -466,8 +467,7 @@ void deleteMachine(machineT** head) {
 }
 
 
-
-void generateStat(machineT* head, const char* type) {
+void generateStat(machineT * head, const char* type) {
 	int total = 0, noBreakdowns = 0;
 	machineT* current = head;
 
@@ -493,5 +493,75 @@ void generateStat(machineT* head, const char* type) {
 	double percentage = (double)noBreakdowns / total * 100;
 	printf("'%s': %.2f%% have no breakdowns (%d of %d machines)\n",
 		type, percentage, noBreakdowns, total);
+}
+
+
+
+void printToReportFile(machineT* head) {
+	if (head == NULL) {
+		printf("No machines to write to file.\n");
+		return;
+	}
+
+	//open fleet text file
+	FILE* file = fopen("fleet.txt", "w");
+	if (file == NULL) {
+		printf("Error opening fleet.txt for writing.\n");
+		return;
+	}
+
+	machineT* current = head;
+	int count = 1;
+
+	fprintf(file, "==== Fleet Machine Report ====\n");
+
+	while (current != NULL) {
+		fprintf(file, "\nMachine #%d\n", count++);
+		fprintf(file, "Chassis Number       : %ld\n", current->chassisNum);
+		fprintf(file, "Make                 : %s\n", current->make);
+		fprintf(file, "Model                : %s\n", current->model);
+		fprintf(file, "Year of Manufacture  : %d\n", current->yearOfManufacture);
+		fprintf(file, "Cost                 : %.2f\n", current->cost);
+		fprintf(file, "Current Valuation    : %.2f\n", current->currentValuation);
+		fprintf(file, "Current Mileage      : %.2f\n", current->currentMileage);
+		fprintf(file, "Next Service Mileage : %.2f\n", current->nextServiceMileage);
+		fprintf(file, "Owner Name           : %s\n", current->ownerName);
+		fprintf(file, "Owner Email          : %s\n", current->ownerEmail);
+		fprintf(file, "Owner Phone          : %s\n", current->ownerPhone);
+		fprintf(file, "Machine Type         : %s\n", current->machineType);
+		fprintf(file, "Breakdown Frequency  : %s\n", current->breakdownFrequency);
+		current = current->next;
+	}
+
+	// Adding machine performance statistics to the file
+	fprintf(file, "\n==== Machine Performance Statistics ====\n");
+
+	const char* types[] = { "Tractor", "Excavator", "Roller", "Crane", "Mixer" };
+	for (int i = 0; i < 5; i++) {
+		int total = 0, noBreakdowns = 0;
+		current = head;
+
+		while (current != NULL) {
+			if (compareIgnoreCase(current->machineType, types[i])) {
+				total++;
+				if (compareIgnoreCase(current->breakdownFrequency, "None") || strcmp(current->breakdownFrequency, "0") == 0) {
+					noBreakdowns++;
+				}
+			}
+			current = current->next;
+		}
+
+		if (total > 0) {
+			double percentage = (double)noBreakdowns / total * 100;
+			fprintf(file, "%s: %.2f%% have no breakdowns (%d of %d machines)\n",
+				types[i], percentage, noBreakdowns, total);
+		}
+		else {
+			fprintf(file, "%s: No machines of this type found.\n", types[i]);
+		}
+	}
+
+	fclose(file);
+	printf("Machine details and performance statistics written to 'fleet.txt'.\n");
 }
 
