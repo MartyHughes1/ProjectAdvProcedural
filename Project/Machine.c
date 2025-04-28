@@ -3,6 +3,7 @@
 #include<stdlib.h>
 #include<string.h>
 
+//structure for storing machine details
 typedef struct machine {
 long chassisNum;
 char make[30];
@@ -69,14 +70,16 @@ int compareIgnoreCase(const char* s1, const char* s2);
 void getPassword(char* password) {
 	int i = 0;
 	char ch;
-
+	// the /r is when enter key is pressed
 	while ((ch = getch()) != '\r') {
+		//below deals with the back space
 		if (ch == '\b') {
 			if (i > 0) {
 				i--;
 				printf("\b \b");
 			}
 		}
+		//below is limit
 		else if (i < 30 - 1) {
 			password[i++] = ch;
 			printf("*");
@@ -99,7 +102,7 @@ void main()
 	char inputUsername[30], inputPassword[30];
 	int i, found = 0;
 
-	// Open the file for reading
+	// Open the file for reading password and username
 	fp = fopen("credentials.txt", "r");
 	if (fp == NULL) {
 		printf("Error opening file.\n");
